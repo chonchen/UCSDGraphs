@@ -126,7 +126,7 @@ public class GraphAdjMatrix extends Graph {
 
 		for (int i = 0; i < distance2Matrix.length; i++)
 		{
-			if (distance2Matrix[v][i] > 0)
+			for (int j = 0; j < distance2Matrix[v][i]; j++)
 			{
 				distanceTwoAway.add(i);
 			}
