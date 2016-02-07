@@ -48,6 +48,36 @@ public class MapGraph {
 			this.roadType = roadType;
 			this.length = length;
 		}
+		
+		public GeographicPoint getDestination()
+		{
+			return to;
+		}
+		
+		public String getRoadName()
+		{
+			return roadName;
+		}
+		
+		public String getRoadType()
+		{
+			return roadType;
+		}
+		
+		public double getLength()
+		{
+			return length;
+		}
+		
+		public void setVisited(boolean visited)
+		{
+			this.visited = visited;
+		}
+		
+		public boolean isVisited()
+		{
+			return visited;
+		}
 	}
 	
 	/** 
@@ -187,15 +217,15 @@ public class MapGraph {
 			Set<Edge> edgeSets = adjList.get(location.toString());
 			for (Edge e: edgeSets)
 			{
-				if (goal.toString().compareTo(e.to.toString()) == 0)
+				if (goal.toString().compareTo(e.getDestination().toString()) == 0)
 				{
 					isGoal = true;
 					break;
 				}
-				if (!e.visited)
+				if (!e.isVisited())
 				{
-					queue.add(e.to);
-					e.visited = true;
+					queue.add(e.getDestination());
+					e.setVisited(true);
 				}
 			}
 		}
