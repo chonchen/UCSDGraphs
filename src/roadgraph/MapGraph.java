@@ -33,53 +33,6 @@ public class MapGraph {
 	private Set<GeographicPoint> vertices;
 	private Hashtable<String, Set<Edge>> adjList;
 	
-	private class Edge
-	{
-		private GeographicPoint to;
-		private String roadName;
-		private String roadType;
-		private double length;
-		private boolean visited;
-		
-		public Edge(GeographicPoint to, String roadName, String roadType, double length)
-		{
-			this.to = to;
-			this.roadName = roadName;
-			this.roadType = roadType;
-			this.length = length;
-		}
-		
-		public GeographicPoint getDestination()
-		{
-			return to;
-		}
-		
-		public String getRoadName()
-		{
-			return roadName;
-		}
-		
-		public String getRoadType()
-		{
-			return roadType;
-		}
-		
-		public double getLength()
-		{
-			return length;
-		}
-		
-		public void setVisited(boolean visited)
-		{
-			this.visited = visited;
-		}
-		
-		public boolean isVisited()
-		{
-			return visited;
-		}
-	}
-	
 	/** 
 	 * Create a new empty MapGraph 
 	 */
@@ -141,7 +94,7 @@ public class MapGraph {
 		
 		if (!adjList.containsKey(location.toString()))
 		{
-			adjList.put(location.toString(), new TreeSet<Edge>());
+			adjList.put(location.toString(), new HashSet<Edge>());
 			vertices.add(location);
 			numOfVertices++;
 			return true;
@@ -176,7 +129,7 @@ public class MapGraph {
 		}
 		
 		Set<Edge> edgeSets = adjList.get(from.toString());
-		edgeSets.add(new Edge(to, roadName, roadType, length));
+		edgeSets.add(new Edge(from, to, roadName, roadType, length));
 		numOfEdges++;
 	}
 	
