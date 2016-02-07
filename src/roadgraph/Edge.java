@@ -9,7 +9,6 @@ public class Edge {
 	private String roadName;
 	private String roadType;
 	private double length;
-	private boolean visited;
 	
 	public Edge(GeographicPoint from, GeographicPoint to, String roadName, String roadType, double length)
 	{
@@ -43,16 +42,6 @@ public class Edge {
 	public double getLength()
 	{
 		return length;
-	}
-	
-	public void setVisited(boolean visited)
-	{
-		this.visited = visited;
-	}
-	
-	public boolean isVisited()
-	{
-		return visited;
 	}
 
 }

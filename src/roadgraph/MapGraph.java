@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.function.Consumer;
 
 import geography.GeographicPoint;
@@ -30,8 +31,9 @@ public class MapGraph {
 	//TODO: Add your member variables here in WEEK 2
 	private int numOfVertices;
 	private int numOfEdges;
-	private Set<GeographicPoint> vertices;
-	private Hashtable<String, Set<Edge>> adjList;
+	private Hashtable<GeographicPoint, Set<GeographicPoint>> neighbors;
+	private Hashtable<GeographicPoint, Set<Edge>> edgeTo;
+	private Set<GeographicPoint> visited;
 	
 	/** 
 	 * Create a new empty MapGraph 
@@ -41,8 +43,9 @@ public class MapGraph {
 		// TODO: Implement in this constructor in WEEK 2
 		numOfVertices = 0;
 		numOfEdges = 0;
-		vertices = new HashSet<GeographicPoint>();
-		adjList = new Hashtable<String, Set<Edge>>();
+		neighbors = new Hashtable<GeographicPoint, Set<GeographicPoint>>();
+		edgeTo = new Hashtable<GeographicPoint, Set<Edge>>();
+		visited = new HashSet<GeographicPoint>();
 	}
 	
 	/**
@@ -62,7 +65,7 @@ public class MapGraph {
 	public Set<GeographicPoint> getVertices()
 	{
 		//TODO: Implement this method in WEEK 2
-		return vertices;
+		return neighbors.keySet();
 	}
 	
 	/**
@@ -92,10 +95,10 @@ public class MapGraph {
 			return false;
 		}
 		
-		if (!adjList.containsKey(location.toString()))
+		if (!neighbors.containsKey(location))
 		{
-			adjList.put(location.toString(), new HashSet<Edge>());
-			vertices.add(location);
+			neighbors.put(location, new HashSet<GeographicPoint>());
+			edgeTo.put(location, new HashSet<Edge>());
 			numOfVertices++;
 			return true;
 		}
@@ -123,13 +126,16 @@ public class MapGraph {
 			throw new IllegalArgumentException("Arguments cannot be null.");
 		}
 		
-		if (!adjList.containsKey(from.toString()) || !adjList.containsKey(to.toString()))
+		if (!neighbors.containsKey(from) || !neighbors.containsKey(to))
 		{
 			throw new IllegalArgumentException("Vertices must be added to graph.");
 		}
 		
-		Set<Edge> edgeSets = adjList.get(from.toString());
-		edgeSets.add(new Edge(from, to, roadName, roadType, length));
+		Set<GeographicPoint> neighborSet = neighbors.get(from);
+		neighborSet.add(to);
+		
+		Set<Edge> edgeSet = edgeTo.get(to);
+		edgeSet.add(new Edge(from, to, roadName, roadType, length));
 		numOfEdges++;
 	}
 	
@@ -168,20 +174,28 @@ public class MapGraph {
 		{
 			GeographicPoint location = queue.remove();
 			nodeSearched.accept(location);
-			Set<Edge> edgeSets = adjList.get(location.toString());
-			for (Edge e: edgeSets)
+			Set<GeographicPoint> neighborSet = neighbors.get(location);
+			for (GeographicPoint n: neighborSet)
 			{
-				if (goal.toString().compareTo(e.getDestination().toString()) == 0)
+				if (visited.contains(n))
+				{
+					queue.add(n);
+					visited.add(n);
+				}
+				
+				if (goal.equals(n))
 				{
 					isGoal = true;
 					break;
 				}
-				if (!e.isVisited())
-				{
-					queue.add(e.getDestination());
-					e.setVisited(true);
-				}
 			}
+		}
+		
+		Stack<GeographicPoint> path = new Stack<GeographicPoint>();
+		
+		if (isGoal)
+		{
+			
 		}
 		
 		// Hook for visualization.  See writeup.
