@@ -8,8 +8,12 @@
 package roadgraph;
 
 
+import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 
 import geography.GeographicPoint;
@@ -24,7 +28,27 @@ import util.GraphLoader;
  */
 public class MapGraph {
 	//TODO: Add your member variables here in WEEK 2
+	private int numOfVertices;
+	private int numOfEdges;
+	private Set<GeographicPoint> vertices;
+	private Hashtable<String, Set<Edge>> adjList;
 	
+	private class Edge
+	{
+		private GeographicPoint to;
+		private String roadName;
+		private String roadType;
+		private double length;
+		private boolean visited;
+		
+		public Edge(GeographicPoint to, String roadName, String roadType, double length)
+		{
+			this.to = to;
+			this.roadName = roadName;
+			this.roadType = roadType;
+			this.length = length;
+		}
+	}
 	
 	/** 
 	 * Create a new empty MapGraph 
@@ -32,6 +56,10 @@ public class MapGraph {
 	public MapGraph()
 	{
 		// TODO: Implement in this constructor in WEEK 2
+		numOfVertices = 0;
+		numOfEdges = 0;
+		vertices = new TreeSet<GeographicPoint>();
+		adjList = new Hashtable<String, Set<Edge>>();
 	}
 	
 	/**
@@ -41,7 +69,7 @@ public class MapGraph {
 	public int getNumVertices()
 	{
 		//TODO: Implement this method in WEEK 2
-		return 0;
+		return numOfVertices;
 	}
 	
 	/**
@@ -51,7 +79,7 @@ public class MapGraph {
 	public Set<GeographicPoint> getVertices()
 	{
 		//TODO: Implement this method in WEEK 2
-		return null;
+		return vertices;
 	}
 	
 	/**
@@ -61,7 +89,7 @@ public class MapGraph {
 	public int getNumEdges()
 	{
 		//TODO: Implement this method in WEEK 2
-		return 0;
+		return numOfEdges;
 	}
 
 	
@@ -76,6 +104,18 @@ public class MapGraph {
 	public boolean addVertex(GeographicPoint location)
 	{
 		// TODO: Implement this method in WEEK 2
+		if (location == null)
+		{
+			return false;
+		}
+		
+		if (!adjList.containsKey(location.toString()))
+		{
+			adjList.put(location.toString(), new TreeSet<Edge>());
+			vertices.add(location);
+			numOfVertices++;
+			return true;
+		}
 		return false;
 	}
 	
@@ -95,7 +135,19 @@ public class MapGraph {
 			String roadType, double length) throws IllegalArgumentException {
 
 		//TODO: Implement this method in WEEK 2
+		if (from == null || to == null || roadName == null || roadType == null || length < 0)
+		{
+			throw new IllegalArgumentException("Arguments cannot be null.");
+		}
 		
+		if (!adjList.containsKey(from.toString()) || !adjList.containsKey(to.toString()))
+		{
+			throw new IllegalArgumentException("Vertices must be added to graph.");
+		}
+		
+		Set<Edge> edgeSets = adjList.get(from.toString());
+		edgeSets.add(new Edge(to, roadName, roadType, length));
+		numOfEdges++;
 	}
 	
 
@@ -124,6 +176,29 @@ public class MapGraph {
 			 					     GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
 		// TODO: Implement this method in WEEK 2
+		Queue<GeographicPoint> queue = new LinkedList<GeographicPoint>();
+		boolean isGoal = false;
+		
+		queue.add(start);
+		
+		while (!queue.isEmpty() && !isGoal)
+		{
+			GeographicPoint location = queue.remove();
+			Set<Edge> edgeSets = adjList.get(location.toString());
+			for (Edge e: edgeSets)
+			{
+				if (goal.toString().compareTo(e.to.toString()) == 0)
+				{
+					isGoal = true;
+					break;
+				}
+				if (!e.visited)
+				{
+					queue.add(e.to);
+					e.visited = true;
+				}
+			}
+		}
 		
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
