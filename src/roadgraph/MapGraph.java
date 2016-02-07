@@ -8,12 +8,12 @@
 package roadgraph;
 
 
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 
 import geography.GeographicPoint;
@@ -88,7 +88,7 @@ public class MapGraph {
 		// TODO: Implement in this constructor in WEEK 2
 		numOfVertices = 0;
 		numOfEdges = 0;
-		vertices = new TreeSet<GeographicPoint>();
+		vertices = new HashSet<GeographicPoint>();
 		adjList = new Hashtable<String, Set<Edge>>();
 	}
 	
@@ -214,6 +214,7 @@ public class MapGraph {
 		while (!queue.isEmpty() && !isGoal)
 		{
 			GeographicPoint location = queue.remove();
+			nodeSearched.accept(location);
 			Set<Edge> edgeSets = adjList.get(location.toString());
 			for (Edge e: edgeSets)
 			{
