@@ -166,11 +166,11 @@ public class MapGraph {
 	{
 		// TODO: Implement this method in WEEK 2
 		Queue<GeographicPoint> queue = new LinkedList<GeographicPoint>();
-		boolean isGoal = false;
+		boolean reachedGoal = false;
 		
 		queue.add(start);
 		
-		while (!queue.isEmpty() && !isGoal)
+		while (!queue.isEmpty() && !reachedGoal)
 		{
 			GeographicPoint location = queue.remove();
 			nodeSearched.accept(location);
@@ -185,7 +185,7 @@ public class MapGraph {
 				
 				if (goal.equals(n))
 				{
-					isGoal = true;
+					reachedGoal = true;
 					break;
 				}
 			}
@@ -193,7 +193,7 @@ public class MapGraph {
 		
 		Stack<GeographicPoint> path = new Stack<GeographicPoint>();
 		
-		if (isGoal)
+		if (reachedGoal)
 		{
 			
 		}
