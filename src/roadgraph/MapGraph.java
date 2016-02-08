@@ -168,21 +168,20 @@ public class MapGraph {
 		
 		while (!queue.isEmpty() && !reachedGoal)
 		{
-			GeographicPoint location = queue.remove();
-			nodeSearched.accept(location);
-			List<Edge> edges = neighbors.get(location);
+			GeographicPoint origin = queue.remove();
+			nodeSearched.accept(origin);
+			List<Edge> edges = neighbors.get(origin);
 			for (Edge e: edges)
 			{
-				GeographicPoint n = e.getDestination();
-				if (!visited.contains(n))
+				GeographicPoint destination = e.getDestination();
+				if (!visited.contains(destination))
 				{
-					queue.add(n);
-					visited.add(n);
-					parentMap.put(n, location);
-					
+					queue.add(destination);
+					visited.add(destination);
+					parentMap.put(destination, origin);	
 				}
 				
-				if (goal.equals(n))
+				if (destination.equals(goal))
 				{
 					reachedGoal = true;
 					break;
