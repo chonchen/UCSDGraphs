@@ -31,8 +31,7 @@ public class MapGraph {
 	//TODO: Add your member variables here in WEEK 2
 	private int numOfVertices;
 	private int numOfEdges;
-	private HashMap<GeographicPoint, Set<GeographicPoint>> neighbors;
-	private HashMap<GeographicPoint, Set<Edge>> edgeTo;
+	private HashMap<GeographicPoint, List<Edge>> neighbors;
 	private Set<GeographicPoint> visited;
 	
 	/** 
@@ -43,8 +42,7 @@ public class MapGraph {
 		// TODO: Implement in this constructor in WEEK 2
 		numOfVertices = 0;
 		numOfEdges = 0;
-		neighbors = new HashMap<GeographicPoint, Set<GeographicPoint>>();
-		edgeTo = new HashMap<GeographicPoint, Set<Edge>>();
+		neighbors = new HashMap<GeographicPoint, List<Edge>>();
 		visited = new HashSet<GeographicPoint>();
 	}
 	
@@ -97,8 +95,7 @@ public class MapGraph {
 		
 		if (!neighbors.containsKey(location))
 		{
-			neighbors.put(location, new HashSet<GeographicPoint>());
-			edgeTo.put(location, new HashSet<Edge>());
+			neighbors.put(location, new LinkedList<Edge>());
 			numOfVertices++;
 			return true;
 		}
@@ -131,11 +128,8 @@ public class MapGraph {
 			throw new IllegalArgumentException("Vertices must be added to graph.");
 		}
 		
-		Set<GeographicPoint> neighborSet = neighbors.get(from);
-		neighborSet.add(to);
-		
-		Set<Edge> edgeSet = edgeTo.get(to);
-		edgeSet.add(new Edge(from, to, roadName, roadType, length));
+		List<Edge> edges = neighbors.get(from);
+		edges.add(new Edge(from, to, roadName, roadType, length));
 		numOfEdges++;
 		
 	}
@@ -168,6 +162,7 @@ public class MapGraph {
 		// TODO: Implement this method in WEEK 2
 		Queue<GeographicPoint> queue = new LinkedList<GeographicPoint>();
 		boolean reachedGoal = false;
+		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
 		
 		queue.add(start);
 		
@@ -175,13 +170,16 @@ public class MapGraph {
 		{
 			GeographicPoint location = queue.remove();
 			nodeSearched.accept(location);
-			Set<GeographicPoint> neighborSet = neighbors.get(location);
-			for (GeographicPoint n: neighborSet)
+			List<Edge> edges = neighbors.get(location);
+			for (Edge e: edges)
 			{
+				GeographicPoint n = e.getDestination();
 				if (!visited.contains(n))
 				{
 					queue.add(n);
 					visited.add(n);
+					parentMap.put(n, location);
+					
 				}
 				
 				if (goal.equals(n))
@@ -197,8 +195,12 @@ public class MapGraph {
 			return null;
 		}
 		
-		
 		Stack<GeographicPoint> path = new Stack<GeographicPoint>();
+		
+		for (GeographicPoint p = goal; p != start; p = parentMap.get(p))
+		{
+			path.push(p);
+		}
 		
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
