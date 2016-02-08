@@ -31,8 +31,8 @@ public class MapGraph {
 	//TODO: Add your member variables here in WEEK 2
 	private int numOfVertices;
 	private int numOfEdges;
+	//Hashmap to store outbound edges of each vertex
 	private HashMap<GeographicPoint, List<Edge>> neighbors;
-	private Set<GeographicPoint> visited;
 	
 	/** 
 	 * Create a new empty MapGraph 
@@ -43,7 +43,6 @@ public class MapGraph {
 		numOfVertices = 0;
 		numOfEdges = 0;
 		neighbors = new HashMap<GeographicPoint, List<Edge>>();
-		visited = new HashSet<GeographicPoint>();
 	}
 	
 	/**
@@ -93,6 +92,7 @@ public class MapGraph {
 			return false;
 		}
 		
+		//create a list object in neighbors if vertex did not already exist
 		if (!neighbors.containsKey(location))
 		{
 			neighbors.put(location, new LinkedList<Edge>());
@@ -128,6 +128,7 @@ public class MapGraph {
 			throw new IllegalArgumentException("Vertices must be added to graph.");
 		}
 		
+		//add outbound edge to the "from" vertex
 		List<Edge> edges = neighbors.get(from);
 		edges.add(new Edge(from, to, roadName, roadType, length));
 		numOfEdges++;
@@ -161,8 +162,12 @@ public class MapGraph {
 	{
 		// TODO: Implement this method in WEEK 2
 		Queue<GeographicPoint> queue = new LinkedList<GeographicPoint>();
+		//checks if goal was reached
 		boolean reachedGoal = false;
+		//parent map to keep track of how we got to the vertex
 		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
+		//keeps track of vertices already visited
+		Set<GeographicPoint> visited = new HashSet<GeographicPoint>();
 		
 		queue.add(start);
 		
@@ -180,7 +185,7 @@ public class MapGraph {
 					visited.add(destination);
 					parentMap.put(destination, origin);	
 				}
-				
+				//if the goal is reached, set reachedGoal to true and exit the loop
 				if (destination.equals(goal))
 				{
 					reachedGoal = true;
@@ -189,6 +194,7 @@ public class MapGraph {
 			}
 		}
 		
+		//returns null if goal was never reached
 		if (!reachedGoal)
 		{
 			return null;
@@ -196,11 +202,12 @@ public class MapGraph {
 		
 		List<GeographicPoint> path = new LinkedList<GeographicPoint>();
 		
+		//builds path from one vertex after start, to the goal
 		for (GeographicPoint p = goal; p != start; p = parentMap.get(p))
 		{
 			path.add(0, p);
 		}
-		
+		//add start to the path
 		path.add(0, start);
 		
 		// Hook for visualization.  See writeup.
