@@ -194,12 +194,14 @@ public class MapGraph {
 			return null;
 		}
 		
-		Stack<GeographicPoint> path = new Stack<GeographicPoint>();
+		List<GeographicPoint> path = new LinkedList<GeographicPoint>();
 		
 		for (GeographicPoint p = goal; p != start; p = parentMap.get(p))
 		{
-			path.push(p);
+			path.add(0, p);
 		}
+		
+		path.add(0, start);
 		
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
