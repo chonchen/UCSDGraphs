@@ -9,7 +9,7 @@ package roadgraph;
 
 
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -31,8 +31,8 @@ public class MapGraph {
 	//TODO: Add your member variables here in WEEK 2
 	private int numOfVertices;
 	private int numOfEdges;
-	private Hashtable<GeographicPoint, Set<GeographicPoint>> neighbors;
-	private Hashtable<GeographicPoint, Set<Edge>> edgeTo;
+	private HashMap<GeographicPoint, Set<GeographicPoint>> neighbors;
+	private HashMap<GeographicPoint, Set<Edge>> edgeTo;
 	private Set<GeographicPoint> visited;
 	
 	/** 
@@ -43,8 +43,8 @@ public class MapGraph {
 		// TODO: Implement in this constructor in WEEK 2
 		numOfVertices = 0;
 		numOfEdges = 0;
-		neighbors = new Hashtable<GeographicPoint, Set<GeographicPoint>>();
-		edgeTo = new Hashtable<GeographicPoint, Set<Edge>>();
+		neighbors = new HashMap<GeographicPoint, Set<GeographicPoint>>();
+		edgeTo = new HashMap<GeographicPoint, Set<Edge>>();
 		visited = new HashSet<GeographicPoint>();
 	}
 	
@@ -137,6 +137,7 @@ public class MapGraph {
 		Set<Edge> edgeSet = edgeTo.get(to);
 		edgeSet.add(new Edge(from, to, roadName, roadType, length));
 		numOfEdges++;
+		
 	}
 	
 
@@ -177,7 +178,7 @@ public class MapGraph {
 			Set<GeographicPoint> neighborSet = neighbors.get(location);
 			for (GeographicPoint n: neighborSet)
 			{
-				if (visited.contains(n))
+				if (!visited.contains(n))
 				{
 					queue.add(n);
 					visited.add(n);
@@ -191,17 +192,18 @@ public class MapGraph {
 			}
 		}
 		
-		Stack<GeographicPoint> path = new Stack<GeographicPoint>();
-		
-		if (reachedGoal)
+		if (!reachedGoal)
 		{
-			
+			return null;
 		}
+		
+		
+		Stack<GeographicPoint> path = new Stack<GeographicPoint>();
 		
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
 
-		return null;
+		return path;
 	}
 	
 
