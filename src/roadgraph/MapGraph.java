@@ -256,10 +256,6 @@ public class MapGraph {
 		{
 			MapNode mp = pq.poll();
 			GeographicNode currentVertex = mp.getVertex();
-			if (currentVertex.equals(goal))
-			{
-				reachedGoal = true;
-			}
 
 			if (!visited.contains(currentVertex))
 			{
@@ -269,14 +265,22 @@ public class MapGraph {
 				for (Edge e: edgeList)
 				{
 					GeographicPoint neighborVertex = e.getDestination();
-					if (e.getLength() + distTo.get(currentVertex) < distTo.get(neighborVertex))
+					double distanceFromStart = distTo.get(currentVertex) + e.getLength();
+
+					if (distanceFromStart < distTo.get(neighborVertex))
 					{
-						distTo.put(neighborVertex, e.getLength() + distTo.get(currentVertex));
+						distTo.put(neighborVertex, distanceFromStart);
 						parentMap.put(neighborVertex, currentVertex);
-						MapNode newNode = new MapNode(GeographicPoint neighborVertex, neighborVertex, e.getLength());
+						MapNode newNode = new MapNode(neighborVertex, distanceFromStart);
 						pq.add(newNode);
 					}
 				}
+			}
+
+			if (currentVertex.equals(goal))
+			{
+				reachedGoal = true;
+				break;
 			}
 			
 		}
@@ -317,6 +321,8 @@ public class MapGraph {
 											 GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
 		// TODO: Implement this method in WEEK 3
+
+
 		
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
