@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
+import java.util.PriorityQueue;
 import java.util.function.Consumer;
 
 import geography.GeographicPoint;
@@ -200,20 +201,10 @@ public class MapGraph {
 			return null;
 		}
 		
-		List<GeographicPoint> path = new LinkedList<GeographicPoint>();
-		
-		//builds path from one vertex after start, to the goal
-		for (GeographicPoint p = goal; p != start; p = parentMap.get(p))
-		{
-			path.add(0, p);
-		}
-		//add start to the path
-		path.add(0, start);
-		
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
 
-		return path;
+		return buildPath(start, goal, parentMap);;
 	}
 	
 
@@ -243,11 +234,62 @@ public class MapGraph {
 										  GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
 		// TODO: Implement this method in WEEK 3
+		PriorityQueue<MapNode> pq = new PriorityQueue<MapNode>();
+		Set<GeographicPoint> visited = new HashSet<GeographicPoint>();
+		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
+		HashMap<GeographicPoint, Double> distTo = new HashMap<GeographicPoint, Double>();
+		boolean reachedGoal = false;
 
+		Set<GeographicPoint> vertices = getVertices();
+
+		for (GeographicPoint vertex: vertices)
+		{
+			distTo.put(vertex, Double.POSITIVE_INFINITY);
+		}
+
+		parentMap.put(start, null);
+		distTo.put(start, 0.0);
+		MapNode startNode = new MapNode(start, 0.0);
+		pq.add(startNode);
+
+		while (!pq.isEmpty())
+		{
+			MapNode mp = pq.poll();
+			GeographicNode currentVertex = mp.getVertex();
+			if (currentVertex.equals(goal))
+			{
+				reachedGoal = true;
+			}
+
+			if (!visited.contains(currentVertex))
+			{
+				visited.add(currentVertex);
+				nodeSearched.accept(currentVertex);
+				List<Edge> edgeList = neighbors.get(currentVertex);
+				for (Edge e: edgeList)
+				{
+					GeographicPoint neighborVertex = e.getDestination();
+					if (e.getLength() + distTo.get(currentVertex) < distTo.get(neighborVertex))
+					{
+						distTo.put(neighborVertex, e.getLength() + distTo.get(currentVertex));
+						parentMap.put(neighborVertex, currentVertex);
+						MapNode newNode = new MapNode(GeographicPoint neighborVertex, neighborVertex, e.getLength());
+						pq.add(newNode);
+					}
+				}
+			}
+			
+		}
+
+		if (!reachedGoal)
+		{
+			return null;
+		}
+		
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
-		
-		return null;
+
+		return buildPath(start, goal, parentMap);	
 	}
 
 	/** Find the path from start to goal using A-Star search
@@ -282,6 +324,20 @@ public class MapGraph {
 		return null;
 	}
 
+	private List<GeographicPoint> buildPath(GeographicPoint start, GeographicPoint goal, Hashmap<GeographicPoint, GeographicPoint> parentMap)
+	{
+		List<GeographicPoint> path = new LinkedList<GeographicPoint>();
+		
+		//builds path from one vertex after start, to the goal
+		for (GeographicPoint p = goal; p != start; p = parentMap.get(p))
+		{
+			path.add(0, p);
+		}
+		//add start to the path
+		path.add(0, start);
+
+		return path;
+	}
 	
 	
 	public static void main(String[] args)
