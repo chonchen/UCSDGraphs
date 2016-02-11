@@ -2,7 +2,7 @@ package roadgraph;
 
 import geography.GeographicPoint;
 
-public class MapNode implements Comparable
+public class MapNode implements Comparable<MapNode>
 {
 	private GeographicPoint vertex;
 	private double distance;
@@ -22,7 +22,6 @@ public class MapNode implements Comparable
 	{
 		return distance;
 	}
-
 	public int compareTo(MapNode m)
 	{
 		if (this.getDistance() > m.getDistance())

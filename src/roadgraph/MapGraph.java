@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.PriorityQueue;
 import java.util.function.Consumer;
 
@@ -204,7 +203,7 @@ public class MapGraph {
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
 
-		return buildPath(start, goal, parentMap);;
+		return buildPath(start, goal, parentMap);
 	}
 	
 
@@ -239,7 +238,7 @@ public class MapGraph {
 		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
 		HashMap<GeographicPoint, Double> distTo = new HashMap<GeographicPoint, Double>();
 		boolean reachedGoal = false;
-
+		
 		Set<GeographicPoint> vertices = getVertices();
 
 		for (GeographicPoint vertex: vertices)
@@ -255,10 +254,12 @@ public class MapGraph {
 		while (!pq.isEmpty())
 		{
 			MapNode mp = pq.poll();
-			GeographicNode currentVertex = mp.getVertex();
+			GeographicPoint currentVertex = mp.getVertex();
 
 			if (!visited.contains(currentVertex))
 			{
+				//System.out.print("d: ");
+				//System.out.println(currentVertex.toString());
 				visited.add(currentVertex);
 				nodeSearched.accept(currentVertex);
 				List<Edge> edgeList = neighbors.get(currentVertex);
@@ -321,16 +322,76 @@ public class MapGraph {
 											 GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
 		// TODO: Implement this method in WEEK 3
-		
+		PriorityQueue<MapNode> pq = new PriorityQueue<MapNode>();
+		Set<GeographicPoint> visited = new HashSet<GeographicPoint>();
+		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
+		HashMap<GeographicPoint, Double> distTo = new HashMap<GeographicPoint, Double>();
+		HashMap<GeographicPoint, Double> distRemaining = new HashMap<GeographicPoint, Double>();
+		boolean reachedGoal = false;
 
-		
+		Set<GeographicPoint> vertices = getVertices();
+
+		for (GeographicPoint vertex: vertices)
+		{
+			distTo.put(vertex, Double.POSITIVE_INFINITY);
+			distRemaining.put(vertex, vertex.distance(goal));
+		}
+
+		parentMap.put(start, null);
+		distTo.put(start, 0.0);
+		MapNode startNode = new MapNode(start, distTo.get(start) + distRemaining.get(start));
+		pq.add(startNode);
+
+		while (!pq.isEmpty())
+		{
+			MapNode mp = pq.poll();
+			GeographicPoint currentVertex = mp.getVertex();
+
+			if (!visited.contains(currentVertex))
+			{
+				//System.out.print("a: ");
+				//System.out.println(currentVertex.toString());
+				visited.add(currentVertex);
+				nodeSearched.accept(currentVertex);
+				List<Edge> edgeList = neighbors.get(currentVertex);
+				for (Edge e: edgeList)
+				{
+					GeographicPoint neighborVertex = e.getDestination();
+					double distanceFromStart = distTo.get(currentVertex) + e.getLength();
+					double predictedTotal = distanceFromStart + distRemaining.get(neighborVertex);
+
+					if (predictedTotal < distTo.get(neighborVertex) + distRemaining.get(neighborVertex))
+					{
+						distTo.put(neighborVertex, distanceFromStart);
+						parentMap.put(neighborVertex, currentVertex);
+						MapNode newNode = new MapNode(neighborVertex, predictedTotal);
+						pq.add(newNode);
+					}
+				}
+			}
+
+			if (currentVertex.equals(goal))
+			{
+				reachedGoal = true;
+				break;
+			}
+					
+		}
+
+		if (!reachedGoal)
+		{
+			return null;
+		}
+				
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
-		
-		return null;
-	}
 
-	private List<GeographicPoint> buildPath(GeographicPoint start, GeographicPoint goal, Hashmap<GeographicPoint, GeographicPoint> parentMap)
+		return buildPath(start, goal, parentMap);	
+	
+	}
+	
+
+	private List<GeographicPoint> buildPath(GeographicPoint start, GeographicPoint goal, HashMap<GeographicPoint, GeographicPoint> parentMap)
 	{
 		List<GeographicPoint> path = new LinkedList<GeographicPoint>();
 		
@@ -345,28 +406,50 @@ public class MapGraph {
 		return path;
 	}
 	
-	
 	public static void main(String[] args)
 	{
 		System.out.print("Making a new map...");
-		MapGraph theMap = new MapGraph();
-		System.out.print("DONE. \nLoading the map...");
-		GraphLoader.loadRoadMap("data/testdata/simpletest.map", theMap);
-		System.out.println("DONE.");
+		//MapGraph theMap = new MapGraph();
+		//System.out.print("DONE. \nLoading the map...");
+		//GraphLoader.loadRoadMap("data/testdata/simpletest.map", theMap);
+		//System.out.println("DONE.");
 		
 		// You can use this method for testing.  
 		
-		/* Use this code in Week 3 End of Week Quiz
+		// Use this code in Week 3 End of Week Quiz
 		MapGraph theMap = new MapGraph();
 		System.out.print("DONE. \nLoading the map...");
+		
+		
+		GraphLoader.loadRoadMap("data/testdata/simpletest.map", theMap);
+		System.out.println("DONE.");
+
+		GeographicPoint start = new GeographicPoint(1, 1);
+		GeographicPoint end = new GeographicPoint(8, -1);
+		
+		/**
 		GraphLoader.loadRoadMap("data/maps/utc.map", theMap);
 		System.out.println("DONE.");
 
 		GeographicPoint start = new GeographicPoint(32.8648772, -117.2254046);
 		GeographicPoint end = new GeographicPoint(32.8660691, -117.217393);
-		
+		*/
 		
 		List<GeographicPoint> route = theMap.dijkstra(start,end);
+		List<GeographicPoint> route2 = theMap.aStarSearch(start,end);
+		
+		System.out.println("dijkstra");
+		for (GeographicPoint g: route)
+		{
+			System.out.println(g.toString());
+		}
+		System.out.println();
+		System.out.println("aStar");
+		for (GeographicPoint g2: route2)
+		{
+			System.out.println(g2.toString());
+		}
+		/**
 		List<GeographicPoint> route2 = theMap.aStarSearch(start,end);
 
 		*/
